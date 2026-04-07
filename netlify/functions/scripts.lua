@@ -741,7 +741,7 @@ run(function()
 		DragonEndFly = debug.getproto(Knit.Controllers.VoidDragonController.flapWings, 1),
 		DragonFly = Knit.Controllers.VoidDragonController.flapWings,
 		DropItem = Knit.Controllers.ItemDropController.dropItemInHand,
-		EquipItem = debug.getproto(require(replicatedStorage.TS.entity.entities['inventory-entity']).InventoryEntity.equipItem, 3),
+		EquipItem = "SetInvItem",
 		FireProjectile = debug.getupvalue(Knit.Controllers.ProjectileController.launchProjectileWithValues, 2),
 		GroundHit = Knit.Controllers.FallDamageController.KnitStart,
 		GuitarHeal = Knit.Controllers.GuitarController.performHeal,
@@ -771,11 +771,26 @@ run(function()
 	end
 
 	for i, v in remoteNames do
-		local remote = dumpRemote(debug.getconstants(v))
-		if remote == '' then
+		local remoteName = ""
+		if type(v) == "string" then
+			remoteName = v
+		elseif type(v) == "function" then
+			local success, constants = pcall(debug.getconstants, v)
+			if success then
+				remoteName = dumpRemote(constants)
+			else
+				warn("Failed to get constants for remote:", i)
+			end
+		elseif typeof(v) == "Instance" and v:IsA("RemoteFunction") then
+			remoteName = v.Name
+		else
+			remoteName = tostring(v)   -- fallback (should rarely happen)
+		end
+
+		if remoteName == "" then
 			notif('Vape', 'Failed to grab remote ('..i..')', 10, 'alert')
 		end
-		remotes[i] = remote
+		remotes[i] = remoteName
 	end
 
 	OldBreak = bedwars.BlockController.isBlockBreakable
