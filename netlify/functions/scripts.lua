@@ -2992,7 +2992,7 @@ run(function()
 		Function = function(callback)
 			if callback then
 				repeat
-					if (workspace:GetServerTimeNow() - bedwars.SwordController.lastAttack) > 0.5 then
+					if (workspace:GetServerTimeNow() - bedwars.SwordController.lastAttack) > Delay.Value then
 						local ent = entitylib.EntityPosition({
 							Part = 'RootPart',
 							Range = Range.Value,
@@ -3022,6 +3022,7 @@ run(function()
 											if not res then
 												FireDelays[item.itemType] = tick()
 											else
+												res.Parent = replicatedStorage
 												local shoot = itemMeta.launchSound
 												shoot = shoot and shoot[math.random(1, #shoot)] or nil
 												if shoot then
@@ -3039,9 +3040,12 @@ run(function()
 							end
 						end
 					end
-					task.wait(0.1)
+					task.wait(0.05)
 				until not ProjectileAura.Enabled
 			end
+		end,
+		ExtraText = function()
+			return Range.Value
 		end,
 		Tooltip = 'Shoots people around you'
 	})
@@ -3056,11 +3060,19 @@ run(function()
 	Range = ProjectileAura:CreateSlider({
 		Name = 'Range',
 		Min = 1,
-		Max = 50,
-		Default = 50,
+		Max = 150,
+		Default = 90,
 		Suffix = function(val)
 			return val == 1 and 'stud' or 'studs'
 		end
+	})
+	Delay = ProjectileAura:CreateSlider({
+		Name = 'Delay After Attack',
+		Min = 0.01,
+		Max = 0.5,
+		Default = 0.25,
+		Decimal = 100,
+		Function = function() end
 	})
 end)
 	
